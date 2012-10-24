@@ -55,8 +55,34 @@ namespace SharpRepository.Tests.Integration
                 repository.Add(contact);
             }
 
-            var result = repository.GetAll(c => c.Name);
-            result.Count().ShouldEqual(5);
+            var results = repository.GetAll(c => c.Name);
+
+            var total = 0;
+            foreach (var result in results)
+                total++;
+
+            total.ShouldEqual(5);
+        }
+
+        [ExecuteForAllRepositories]
+        public void GetAll_With_Anonymous_Selector_Should_Return_Every_Item(IRepository<Contact, string> repository)
+        {
+            for (int i = 1; i <= 5; i++)
+            {
+                var contact = new Contact { Name = "Test User " + i };
+                repository.Add(contact);
+            }
+
+            var results = repository.GetAll(c => new {c.Name, c.Title});
+
+            var total = 0;
+            foreach (var result in results)
+            {
+                result.Name.ShouldStartWith("Test User");
+                total++;
+            }
+
+            total.ShouldEqual(5);
         }
 
         [ExecuteForAllRepositories]
